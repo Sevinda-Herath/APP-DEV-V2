@@ -75,10 +75,11 @@ export default function Login() {
               onChange={handleChange}
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-4 flex justify-center">
             <ReCAPTCHA
               sitekey="6LeszxIrAAAAAJrZUGpSFPv4uznl_iYenAebzQ0-" // Replace with your site key
               onChange={handleRecaptchaChange}
+              size="compact" // Use the compact size for a smaller reCAPTCHA
             />
           </div>
           {errorMessage && <div className="text-red-500 text-sm mb-3">{errorMessage}</div>}

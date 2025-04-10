@@ -41,24 +41,30 @@ export default function Admin() {
       <div className="mb-10">
         <h2 className="text-2xl text-pink-600 mb-3">All Users</h2>
         <table className="w-full table-auto border">
-          <thead>
+        <thead>
             <tr className="bg-indigo-200">
-              <th className="px-3 py-2 border">Name</th>
+              <th className="px-3 py-2 border">First Name</th>
+              <th className="px-3 py-2 border">Last Name</th>
               <th className="px-3 py-2 border">Email</th>
-              <th className="px-3 py-2 border">Institution</th>
+              <th className="px-3 py-2 border">Mobile Number</th>
+              <th className="px-3 py-2 border">Institution Type</th>
+              <th className="px-3 py-2 border">Institution Name</th>
+              <th className="px-3 py-2 border">Education Level</th>
               <th className="px-3 py-2 border">Games</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
               <tr key={user._id} className="text-sm text-gray-700">
-                <td className="px-3 py-2 border">
-                  {user.fname} {user.lname}
-                </td>
-                <td className="px-3 py-2 border">{user.email}</td>
-                <td className="px-3 py-2 border">{user.institutionName}</td>
-                <td className="px-3 py-2 border">{user.games?.join(', ')}</td>
-              </tr>
+              <td className="px-3 py-2 border">{user.fname}</td>
+              <td className="px-3 py-2 border">{user.lname}</td>
+              <td className="px-3 py-2 border">{user.email}</td>
+              <td className="px-3 py-2 border">{user.mnumber}</td>
+              <td className="px-3 py-2 border">{user.institutionType}</td>
+              <td className="px-3 py-2 border">{user.institutionName}</td>
+              <td className="px-3 py-2 border">{user.educationLevel}</td>
+              <td className="px-3 py-2 border">{user.games?.join(', ')}</td>
+            </tr>
             ))}
           </tbody>
         </table>

@@ -79,7 +79,6 @@ export default function Login() {
             <ReCAPTCHA
               sitekey="6LeszxIrAAAAAJrZUGpSFPv4uznl_iYenAebzQ0-" // Replace with your site key
               onChange={handleRecaptchaChange}
-              size="compact" // Use the compact size for a smaller reCAPTCHA
             />
           </div>
           {errorMessage && <div className="text-red-500 text-sm mb-3">{errorMessage}</div>}

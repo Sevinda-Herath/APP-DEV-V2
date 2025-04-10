@@ -1,7 +1,13 @@
 import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Register() {
   const [formData, setFormData] = useState({});
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+
+  const handleRecaptchaChange = (token) => {
+    setRecaptchaToken(token); // Save the reCAPTCHA token
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,10 +26,16 @@ export default function Register() {
         .map((checkbox) => checkbox.value),
       password: form.password.value,
       cpassword: form.cpassword.value,
+      recaptchaToken, // Include the reCAPTCHA token
     };
 
     if (data.password !== data.cpassword) {
       alert("Passwords do not match.");
+      return;
+    }
+
+    if (!recaptchaToken) {
+      alert("Please complete the reCAPTCHA verification.");
       return;
     }
 
@@ -40,6 +52,7 @@ export default function Register() {
       if (response.ok) {
         alert("Registration successful!");
         form.reset();
+        setRecaptchaToken(null); // Reset the reCAPTCHA token
       } else {
         alert(result.error || "Registration failed.");
       }
@@ -52,7 +65,7 @@ export default function Register() {
   return (
     <section>
       <div className="mb-20"></div>
-      <div className="container px-5  mx-auto">
+      <div className="container px-5 mx-auto">
         <div className="flex flex-col">
           <div className="h-1 bg-gray-200 rounded overflow-hidden">
             <div className="w-24 h-full bg-indigo-500"></div>
@@ -146,6 +159,14 @@ export default function Register() {
               <label className="text-slate-800 text-sm font-medium mb-2 block">Confirm Password</label>
               <input name="cpassword" type="password" required className="bg-slate-100 w-full text-slate-800 text-sm px-4 py-3 rounded focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter confirm password" />
             </div>
+          </div>
+
+          {/* reCAPTCHA */}
+          <div className="mt-6 flex justify-center">
+            <ReCAPTCHA
+              sitekey="6LeszxIrAAAAAJrZUGpSFPv4uznl_iYenAebzQ0-" // Replace with your site key
+              onChange={handleRecaptchaChange}
+            />
           </div>
 
           {/* Submit */}

@@ -4,9 +4,40 @@ import ReCAPTCHA from "react-google-recaptcha";
 export default function Register() {
   const [formData, setFormData] = useState({});
   const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const [passwordStrength, setPasswordStrength] = useState("");
 
   const handleRecaptchaChange = (token) => {
     setRecaptchaToken(token); // Save the reCAPTCHA token
+  };
+
+  const evaluatePasswordStrength = (password) => {
+    if (!password) {
+      setPasswordStrength("");
+      return;
+    }
+
+    const strengthCriteria = [
+      /[a-z]/.test(password), // Lowercase letter
+      /[A-Z]/.test(password), // Uppercase letter
+      /[0-9]/.test(password), // Digit
+      /[^a-zA-Z0-9]/.test(password), // Special character
+      password.length >= 8, // Minimum length
+    ];
+
+    const strengthScore = strengthCriteria.filter(Boolean).length;
+
+    if (strengthScore <= 2) {
+      setPasswordStrength("Weak");
+    } else if (strengthScore === 3 || strengthScore === 4) {
+      setPasswordStrength("Medium");
+    } else {
+      setPasswordStrength("Strong");
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    const password = e.target.value;
+    evaluatePasswordStrength(password);
   };
 
   const handleSubmit = async (e) => {
@@ -151,7 +182,17 @@ export default function Register() {
             {/* Password */}
             <div>
               <label className="text-slate-800 text-sm font-medium mb-2 block">Password</label>
-              <input name="password" type="password" required className="bg-slate-100 w-full text-slate-800 text-sm px-4 py-3 rounded focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter password" />
+              <input
+                name="password"
+                type="password"
+                required
+                className="bg-slate-100 w-full text-slate-800 text-sm px-4 py-3 rounded focus:bg-transparent outline-blue-500 transition-all"
+                placeholder="Enter password"
+                onChange={handlePasswordChange}
+              />
+              <p className={`text-sm mt-1 ${passwordStrength === "Strong" ? "text-green-600" : passwordStrength === "Medium" ? "text-yellow-600" : "text-red-600"}`}>
+                {passwordStrength && `Password Strength: ${passwordStrength}`}
+              </p>
             </div>
 
             {/* Confirm Password */}

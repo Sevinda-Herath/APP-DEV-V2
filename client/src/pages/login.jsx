@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import esportlogo from "../assets/Untitled.jpeg";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Login() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -16,11 +18,23 @@ export default function Login() {
     });
   };
 
+  const handleRecaptchaChange = (token) => {
+    setRecaptchaToken(token); // Save the reCAPTCHA token
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!recaptchaToken) {
+      setErrorMessage('Please complete the reCAPTCHA verification.');
+      return;
+    }
+
     try {
-      const res = await axios.post('http://localhost:5000/login', credentials);
+      const res = await axios.post('http://localhost:5000/login', {
+        ...credentials,
+        recaptchaToken, // Send the reCAPTCHA token to the backend
+      });
       localStorage.setItem('token', res.data.token);
 
       // Redirect based on email
@@ -59,6 +73,12 @@ export default function Login() {
               name="password"
               value={credentials.password}
               onChange={handleChange}
+            />
+          </div>
+          <div className="mb-4">
+            <ReCAPTCHA
+              sitekey="6LeszxIrAAAAAJrZUGpSFPv4uznl_iYenAebzQ0-" // Replace with your site key
+              onChange={handleRecaptchaChange}
             />
           </div>
           {errorMessage && <div className="text-red-500 text-sm mb-3">{errorMessage}</div>}

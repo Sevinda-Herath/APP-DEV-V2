@@ -5,10 +5,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const axios = require('axios'); // Added for reCAPTCHA verification
 const User = require('./models/User');
 const Contact = require('./models/Contact');
 const contactRoutes = require('./routes/contact'); // Adjust the path if needed
-
 
 dotenv.config();
 const app = express();
@@ -41,12 +41,42 @@ const authMiddleware = (req, res, next) => {
 const adminMiddleware = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    if (!user || user.email  !== 'sevindaherath@gmail.com') {
+    if (!user || user.email !== 'sevindaherath@gmail.com') {
       return res.status(403).json({ message: 'Access denied' });
     }
     next();
   } catch (err) {
     res.status(500).json({ message: 'Error checking admin privileges' });
+  }
+};
+
+// Middleware to verify Google reCAPTCHA
+const verifyRecaptcha = async (req, res, next) => {
+  const { recaptchaToken } = req.body;
+  if (!recaptchaToken) {
+    return res.status(400).json({ message: 'reCAPTCHA token is required' });
+  }
+
+  try {
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify`,
+      null,
+      {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET_KEY, // Your reCAPTCHA secret key
+          response: recaptchaToken,
+        },
+      }
+    );
+
+    if (!response.data.success) {
+      return res.status(400).json({ message: 'reCAPTCHA verification failed' });
+    }
+
+    next();
+  } catch (err) {
+    console.error('reCAPTCHA Verification Error:', err);
+    res.status(500).json({ message: 'Error verifying reCAPTCHA' });
   }
 };
 
@@ -82,7 +112,7 @@ app.post('/register', async (req, res) => {
 });
 
 // User Login Route
-app.post('/login', async (req, res) => {
+app.post('/login', verifyRecaptcha, async (req, res) => {
   const { email, password } = req.body;
 
   try {

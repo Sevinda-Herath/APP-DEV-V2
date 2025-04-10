@@ -7,6 +7,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
 const Contact = require('./models/Contact');
+const contactRoutes = require('./routes/contact'); // Adjust the path if needed
+
 
 dotenv.config();
 const app = express();
@@ -147,6 +149,9 @@ app.get('/api/admin/messages', authMiddleware, adminMiddleware, async (req, res)
     res.status(500).json({ message: 'Failed to fetch messages' });
   }
 });
+
+// Contact Form Route
+app.use('/api/contact', contactRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

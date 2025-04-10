@@ -200,6 +200,20 @@ export default function Profile() {
               <p className="text-sm text-gray-600">
                 Members: {team.members.length}/5
               </p>
+              <div className="mb-2">
+                <h5 className="text-sm font-semibold text-indigo-600">Team Members:</h5>
+                {team.members.length > 0 ? (
+                  <ul className="list-disc pl-5">
+                    {team.members.map((member) => (
+                      <li key={member._id} className="text-gray-700">
+                        {member.fname} {member.lname}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500">No members yet.</p>
+                )}
+              </div>
               {team.members.some((member) => member._id === user._id) ? (
                 <p className="text-blue-600">You are already a member</p>
               ) : team.members.length < 5 ? (

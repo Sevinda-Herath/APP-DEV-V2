@@ -9,6 +9,7 @@ const axios = require('axios'); // Added for reCAPTCHA verification
 const User = require('./models/User');
 const Contact = require('./models/Contact');
 const contactRoutes = require('./routes/contact'); // Adjust the path if needed
+const teamRoutes = require('./routes/teamRoutes');
 
 dotenv.config();
 const app = express();
@@ -20,8 +21,8 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB Connected'))
-.catch(err => console.error('MongoDB Connection Error:', err));
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.error('MongoDB Connection Error:', err));
 
 // Middleware to authenticate JWT tokens
 const authMiddleware = (req, res, next) => {
@@ -88,6 +89,8 @@ app.post('/register', async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = new User({
       fname,
       lname,
@@ -97,7 +100,7 @@ app.post('/register', async (req, res) => {
       institutionName,
       educationLevel,
       games,
-      password,
+      password: hashedPassword,
     });
 
     await newUser.save();
@@ -182,6 +185,9 @@ app.get('/api/admin/messages', authMiddleware, adminMiddleware, async (req, res)
 
 // Contact Form Route
 app.use('/api/contact', contactRoutes);
+
+// Team Routes
+app.use('/api/teams', teamRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

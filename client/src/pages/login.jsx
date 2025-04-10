@@ -22,7 +22,13 @@ export default function Login() {
     try {
       const res = await axios.post('http://localhost:5000/login', credentials);
       localStorage.setItem('token', res.data.token);
-      navigate('/profile');
+
+      // Redirect based on email
+      if (credentials.email === 'sevindaherath@gmail.com') {
+        navigate('/admin'); // Redirect to admin page
+      } else {
+        navigate('/profile'); // Redirect to profile page
+      }
     } catch (err) {
       setErrorMessage(err.response?.data?.message || 'Login failed');
     }

@@ -12,6 +12,7 @@ import Contact from './pages/contact'
 import Register from './pages/register'
 import Login from './pages/login'
 import Profile from './pages/profile'
+import Admin from './pages/admin'
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
 `           <Route path="/Register" element={<Register />} /> 
             <Route path="/Login" element={<Login />} />
             <Route path="/Profile" element={<Profile />} />
+            <Route path="/Admin" element={<Admin />} />
             {/* Add more routes here if needed */}
           </Routes>
         </main>

@@ -67,7 +67,6 @@ export default function Admin() {
               <th className="px-3 py-2 border">Name</th>
               <th className="px-3 py-2 border">Email</th>
               <th className="px-3 py-2 border">Message</th>
-              <th className="px-3 py-2 border">Date</th>
             </tr>
           </thead>
           <tbody>
@@ -76,7 +75,6 @@ export default function Admin() {
                 <td className="px-3 py-2 border">{msg.name}</td>
                 <td className="px-3 py-2 border">{msg.email}</td>
                 <td className="px-3 py-2 border">{msg.message}</td>
-                <td className="px-3 py-2 border">{new Date(msg.createdAt).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>

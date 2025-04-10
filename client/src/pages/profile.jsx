@@ -53,7 +53,7 @@ export default function Profile() {
 
   const joinTeam = async (teamId) => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `http://localhost:5000/api/teams/${teamId}/join`,
         {},
         {
@@ -71,6 +71,25 @@ export default function Profile() {
       } else {
         setMessage('Failed to join team. Please try again later.');
       }
+    }
+  };
+
+  const leaveTeam = async (teamId) => {
+    try {
+      await axios.post(
+        `http://localhost:5000/api/teams/${teamId}/leave`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+      setMessage('Left team successfully!');
+      fetchTeams(); // Refresh teams
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to leave team. Please try again later.');
     }
   };
 
@@ -215,7 +234,15 @@ export default function Profile() {
                 )}
               </div>
               {team.members.some((member) => member._id === user._id) ? (
-                <p className="text-blue-600">You are already a member</p>
+                <div>
+                  <p className="text-blue-600">You are already a member</p>
+                  <button
+                    onClick={() => leaveTeam(team._id)}
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition mt-2"
+                  >
+                    Leave Team
+                  </button>
+                </div>
               ) : team.members.length < 5 ? (
                 <button
                   onClick={() => joinTeam(team._id)}

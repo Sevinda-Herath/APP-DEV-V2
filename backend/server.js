@@ -3,12 +3,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const axios = require('axios'); // Added for reCAPTCHA verification
+const axios = require('axios');
 const User = require('./models/User');
 const Contact = require('./models/Contact');
-const contactRoutes = require('./routes/contact'); // Adjust the path if needed
+const contactRoutes = require('./routes/contact');
 const teamRoutes = require('./routes/teamRoutes');
 
 dotenv.config();
@@ -17,10 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.error('MongoDB Connection Error:', err));
 
@@ -64,7 +60,7 @@ const verifyRecaptcha = async (req, res, next) => {
       null,
       {
         params: {
-          secret: process.env.RECAPTCHA_SECRET_KEY, // Your reCAPTCHA secret key
+          secret: process.env.RECAPTCHA_SECRET_KEY,
           response: recaptchaToken,
         },
       }
@@ -83,13 +79,21 @@ const verifyRecaptcha = async (req, res, next) => {
 
 // User Registration Route
 app.post('/register', async (req, res) => {
-  const { fname, lname, email, mnumber, institutionType, institutionName, educationLevel, games, password } = req.body;
+  const {
+    fname,
+    lname,
+    email,
+    mnumber,
+    institutionType,
+    institutionName,
+    educationLevel,
+    games,
+    password
+  } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       fname,
@@ -100,7 +104,7 @@ app.post('/register', async (req, res) => {
       institutionName,
       educationLevel,
       games,
-      password: hashedPassword,
+      password, // Hashing happens automatically in the User model
     });
 
     await newUser.save();
@@ -122,8 +126,10 @@ app.post('/login', verifyRecaptcha, async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: 'Invalid email or password' });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid email or password' });
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
